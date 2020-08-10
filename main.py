@@ -49,7 +49,7 @@ def processing_request(request):
         scene_update (state)
         if request['level'] == 10:
                 send_to_serial(json.dumps({'deviceIdentifier': 'sw9', 'power': True, 'period':2000}).encode())
-                time.sleap(1)
+                time.sleep(1)
                 send_to_serial(json.dumps({'deviceIdentifier': 'pwm1', 'power': True, 'level': 10, 'period': 5000}).encode())
                 return
         elif request['level'] == 255:
@@ -130,9 +130,10 @@ def video_update(shreder):
     if shreder == True:
         price = 0
         now = datetime.datetime.now()
-        price = 200 - 24*(now.day-10) -(now.hour-4)
-        if price < 0:
-            price = 0
+        price = 24*(now.day-10) + (now.hour-4)
+        print("price= " + price, end="\n")
+        if price > 200:
+            price = 200
         fim_str = None
         global image
         if now.second >= 0 and now.second <20 :
