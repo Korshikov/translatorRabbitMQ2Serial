@@ -15,6 +15,7 @@ import json
 
 def callback(ch, method, properties, body):
     request = json.loads(body.decode("utf-8"))
+    print(request, end="\n")
     if 'process' in request and request['process']:
         processing_request(request)
     else:
@@ -43,9 +44,9 @@ def send_to_log(message):
     pass
 
 def processing_request(request):
-    state = request['state']
-    scene_update (state)
     if request['deviceIdentifier'] == 'pwm1':
+        state = request['state']
+        scene_update (state)
         if request['level'] == 10:
                 send_to_serial(json.dumps({'deviceIdentifier': 'sw9', 'power': True, 'period':2000}).encode())
                 time.sleap(1)
@@ -54,12 +55,12 @@ def processing_request(request):
         elif request['level'] == 255:
             process_full_laser_run()
             return 
-    elif request['deviceIdentifier'] == 'ssr2':
+    elif request['deviceIdentifier'] == 'ssr3':
         
-            if request['power'] > 30:
+            if request['level'] > 30:
                 send_to_serial(json.dumps({'deviceIdentifier': 'sw4', 'power': True}).encode())
                 send_to_serial(json.dumps({'deviceIdentifier': 'ssr3', 'power': True, 'level': request['level']}).encode())
-                if request['power'] > 180:
+                if request['level'] > 180:
                     send_to_serial(json.dumps({'deviceIdentifier': 'ssr2', 'power': True, 'level': request['level']}).encode())
                 else:
                     send_to_serial(json.dumps({'deviceIdentifier': 'ssr2', 'power': False}).encode())
@@ -129,33 +130,16 @@ def video_update(shreder):
     if shreder == True:
         price = 0
         now = datetime.datetime.now()
-        if now.day == 10:
-            if now.hour>=10:
-                price = 200 - now.hour + 4
-        
-        elif now.day == 11:
-            price = 200 - now.hour - 14
-        elif now.day == 12:
-            price = 200 - now.hour - 38
-        elif now.day == 13:
-            price = 200 - now.hour - 62
-        elif now.day == 14:    
-            price = 200 - now.hour - 86
-        elif now.day == 15:
-            price = 200 - now.hour - 110
-        elif now.day == 16:
-            price = 200 - now.hour - 134
-        elif now.day == 17:
-            price = 200 - now.hour - 158
-        elif now.day == 18:
-            price = 200 - now.hour - 182
+        price = 200 - 24*(now.day-10) -(now.hour-4)
+        if price < 0:
+            price = 0
         fim_str = None
         global image
         if now.second >= 0 and now.second <20 :
             timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(30 + now.minute) + ".jpg"
             fim_str = timer_str
             if now.minute == 00:
-                send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 900}).encode())
+                send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 1500}).encode())
         elif now.second >= 20 and now.second <40 :
             money_yep_str = "/home/pi/Pictures/Timers_AME/02_Money_Yep/02_Money_Yep" + "{:0>3}".format(price) + ".jpg"
             fim_str = money_yep_str
@@ -174,6 +158,7 @@ def video_update(shreder):
         now = datetime.datetime.now()
         if now - timestamp > 5400 and now - timestamp < 5520:
             send_to_serial(json.dumps({'deviceIdentifier': 'pwm1', 'power': True, 'level': 255, 'period': 60000}).encode())
+            send_to_serial(json.dumps({'deviceIdentifier': 'sw9', 'power': True, 'period': 2000}).encode())
         if now - timestamp > 5520 and now - timestamp < 6000:
             send_to_serial(json.dumps({'deviceIdentifier': 'sw15', 'power': True, 'period': 30000}).encode())
 
