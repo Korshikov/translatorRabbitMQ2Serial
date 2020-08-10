@@ -135,9 +135,14 @@ def scene_update(scene):
         send_to_serial(json.dumps({'deviceIdentifier': 'sw2', 'power': False}).encode())  # освещение лазера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw3', 'power': True}).encode())  # гирлянда в аквариуме
         send_to_serial(
-            json.dumps({'deviceIdentifier': 'sw5', 'power': False}).encode())  # освещение лазера
+            json.dumps({'deviceIdentifier': 'sw5', 'power': True}).encode())  # освещение лазера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw6', 'power': True}).encode())  # освещение шредера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw12', 'power': True}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw11', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw13', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw7', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw8', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'ws2813', 'power': True, 'color':'FF0000', 'level':20, 'start':0, 'end': 587}).encode())  # аварийная сигнализация
         video_update(False)
 
 
@@ -188,7 +193,7 @@ def video_update(shreder):
         if 5520 < (now - timestamp).total_seconds() < 6000:
             send_to_serial(json.dumps({'deviceIdentifier': 'sw15', 'power': True, 'period': 30000}).encode())
         if 6000 < (now - timestamp).total_seconds() and finished is None:
-            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/finish.mp4"])
+            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/RuVDS_FINAL_REN.mp4"])
             finished = True
 
 
