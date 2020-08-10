@@ -156,11 +156,11 @@ def video_update(shreder):
             price = 200
         fim_str = None
         if 0 <= now.second < 20:
-            timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(30 + now.minute) + ".jpg"
+            timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(31 + now.minute) + ".jpg"
             fim_str = timer_str
             if now.minute == 00:
                 if price != moneycounter:
-                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 3500}).encode())
+                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 3700}).encode())
                     moneycounter = price
         elif 20 <= now.second < 40:
             money_yep_str = "/home/pi/Pictures/Timers_AME/02_Money_Yep/02_Money_Yep" + "{:0>3}".format(price) + ".jpg"
@@ -188,7 +188,7 @@ def video_update(shreder):
         if 5520 < (now - timestamp).total_seconds() < 6000:
             send_to_serial(json.dumps({'deviceIdentifier': 'sw15', 'power': True, 'period': 30000}).encode())
         if 6000 < (now - timestamp).total_seconds() and finished is None:
-            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/WLCM_VIDEO_INFLUENCERS.mp4"])
+            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/finish.mp4"])
             finished = True
 
 
