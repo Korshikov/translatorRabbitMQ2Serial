@@ -143,11 +143,11 @@ def scene_update(scene):
 
 def video_update(shreder):
     global image
-    if shreder == True:
+    if shreder:
         price = 0
         now = datetime.datetime.now()
         price = 24 * (now.day - 10) + (now.hour - 4)
-        print("price= " + price, end="\n")
+        print("price= %d" % price, end="\n")
         if price > 200:
             price = 200
         fim_str = None
@@ -167,17 +167,18 @@ def video_update(shreder):
             image.kill()
         image = subprocess.Popen(["fim", "-q", "-r", "1920×1080", fim_str])
     else:
+        global timestamp
         if image is not None:
             image.kill()
         if timestamp is None:
             timestamp = datetime.datetime.now()
             video = subprocess.Popen(["omxplayer", "/home/pi/Pictures/01_TIMER_start_Laser.mp4"])
         now = datetime.datetime.now()
-        if now - timestamp > 5400 and now - timestamp < 5520:
+        if 5400 < (now - timestamp).total_seconds() < 5520:
             send_to_serial(
                 json.dumps({'deviceIdentifier': 'pwm1', 'power': True, 'level': 255, 'period': 60000}).encode())
             send_to_serial(json.dumps({'deviceIdentifier': 'sw9', 'power': True, 'period': 2000}).encode())
-        if now - timestamp > 5520 and now - timestamp < 6000:
+        if 5520 < (now - timestamp).total_seconds() < 6000:
             send_to_serial(json.dumps({'deviceIdentifier': 'sw15', 'power': True, 'period': 30000}).encode())
 
 
@@ -203,6 +204,7 @@ threadLock = threading.Lock()
 channel = None
 state = 0
 image = None
+timestamp = None
 
 if __name__ == '__main__':
     consume()
