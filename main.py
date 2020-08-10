@@ -143,6 +143,10 @@ def scene_update(scene):
 
 def video_update(shreder):
     global image
+    global counter
+    global finished
+    global moneycounter
+    counter = (counter + 1) % 5000
     if shreder:
         price = 0
         now = datetime.datetime.now()
@@ -155,7 +159,9 @@ def video_update(shreder):
             timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(30 + now.minute) + ".jpg"
             fim_str = timer_str
             if now.minute == 00:
-                send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 1500}).encode())
+                if price != moneycounter:
+                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 3500}).encode())
+                    moneycounter = price
         elif 20 <= now.second < 40:
             money_yep_str = "/home/pi/Pictures/Timers_AME/02_Money_Yep/02_Money_Yep" + "{:0>3}".format(price) + ".jpg"
             fim_str = money_yep_str
@@ -176,10 +182,14 @@ def video_update(shreder):
         now = datetime.datetime.now()
         if 5400 < (now - timestamp).total_seconds() < 5520:
             send_to_serial(
-                json.dumps({'deviceIdentifier': 'pwm1', 'power': True, 'level': 255, 'period': 60000}).encode())
-            send_to_serial(json.dumps({'deviceIdentifier': 'sw9', 'power': True, 'period': 2000}).encode())
+                json.dumps({'deviceIdentifier': 'pwm1', 'power': True, 'level': 255, 'period': 200000}).encode())
+            if counter % 4 == 0:
+                send_to_serial(json.dumps({'deviceIdentifier': 'sw9', 'power': True, 'period': 2000}).encode())
         if 5520 < (now - timestamp).total_seconds() < 6000:
             send_to_serial(json.dumps({'deviceIdentifier': 'sw15', 'power': True, 'period': 30000}).encode())
+        if 6000 < (now - timestamp).total_seconds() and finished is None:
+            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/WLCM_VIDEO_INFLUENCERS.mp4"])
+            finished = True
 
 
 @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
@@ -205,6 +215,9 @@ channel = None
 state = 0
 image = None
 timestamp = None
+counter = 0
+finished = None
+moneycounter = 0
 
 if __name__ == '__main__':
     consume()
