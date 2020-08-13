@@ -110,6 +110,7 @@ def scene_update(scene):
             json.dumps({'deviceIdentifier': 'sw5', 'power': True}).encode())  # освещение лазера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw6', 'power': True}).encode())  # освещение шредера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw12', 'power': False}).encode())  # аварийная сигнализация
+        video_update(True)
     elif scene == 3:
         # 3- включено питание лазера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw1', 'power': False}).encode())  # свет на гирю
@@ -135,9 +136,16 @@ def scene_update(scene):
         send_to_serial(json.dumps({'deviceIdentifier': 'sw2', 'power': False}).encode())  # освещение лазера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw3', 'power': True}).encode())  # гирлянда в аквариуме
         send_to_serial(
-            json.dumps({'deviceIdentifier': 'sw5', 'power': False}).encode())  # освещение лазера
+            json.dumps({'deviceIdentifier': 'sw5', 'power': True}).encode())  # освещение лазера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw6', 'power': True}).encode())  # освещение шредера
         send_to_serial(json.dumps({'deviceIdentifier': 'sw12', 'power': True}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw11', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw13', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw7', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps({'deviceIdentifier': 'sw8', 'power': False}).encode())  # аварийная сигнализация
+        send_to_serial(json.dumps(
+            {'deviceIdentifier': 'ws2813', 'power': True, 'color': 'FF0000', 'level': 20, 'start': 0,
+             'end': 587}).encode())  # аварийная сигнализация
         video_update(False)
 
 
@@ -150,7 +158,7 @@ def video_update(shreder):
     if shreder:
         price = 0
         now = datetime.datetime.now()
-        price = 24 * (now.day - 10) + (now.hour - 4)
+        price = 24 * (now.day - 10) + (now.hour - 16)
         print("price= %d" % price, end="\n")
         if price > 200:
             price = 200
@@ -160,7 +168,7 @@ def video_update(shreder):
             fim_str = timer_str
             if now.minute == 00:
                 if price != moneycounter:
-                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 3700}).encode())
+                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 4300}).encode())
                     moneycounter = price
         elif 20 <= now.second < 40:
             money_yep_str = "/home/pi/Pictures/Timers_AME/02_Money_Yep/02_Money_Yep" + "{:0>3}".format(price) + ".jpg"
@@ -188,7 +196,7 @@ def video_update(shreder):
         if 5520 < (now - timestamp).total_seconds() < 6000:
             send_to_serial(json.dumps({'deviceIdentifier': 'sw15', 'power': True, 'period': 30000}).encode())
         if 6000 < (now - timestamp).total_seconds() and finished is None:
-            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/finish.mp4"])
+            video = subprocess.Popen(["omxplayer", "--loop", "/home/pi/Pictures/RuVDS_FINAL_REN.mp4"])
             finished = True
 
 
