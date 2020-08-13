@@ -159,16 +159,28 @@ def video_update(shreder):
         price = 0
         now = datetime.datetime.now()
         price = 24 * (now.day - 10) + (now.hour - 16)
+        if 24 * (now.day - 13) + (now.hour - 12) >= 0:
+            price = price + 24 * (now.day - 13) + (now.hour - 12)
+            if now.minute >= 30:
+                price = price + 1
         print("price= %d" % price, end="\n")
         if price > 200:
             price = 200
         fim_str = None
         if 0 <= now.second < 20:
-            timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(31 + now.minute) + ".jpg"
+            if 24 * (now.day - 13) + (now.hour - 12) >= 0:
+                timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(
+                    61 + (now.minute % 30)) + ".jpg"
+            else:
+                timer_str = "/home/pi/Pictures/Timers_AME/01_TIMER/01_TIMER" + "{:0>2}".format(31 + now.minute) + ".jpg"
             fim_str = timer_str
             if now.minute == 00:
                 if price != moneycounter:
-                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 4300}).encode())
+                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 4500}).encode())
+                    moneycounter = price
+            if 24 * (now.day - 13) + (now.hour - 12) >= 0 and now.minute == 30:
+                if price != moneycounter:
+                    send_to_serial(json.dumps({'deviceIdentifier': 'sw14', 'power': True, 'period': 4500}).encode())
                     moneycounter = price
         elif 20 <= now.second < 40:
             money_yep_str = "/home/pi/Pictures/Timers_AME/02_Money_Yep/02_Money_Yep" + "{:0>3}".format(price) + ".jpg"
